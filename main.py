@@ -24,6 +24,8 @@ driver.execute_script("window.onblur = function() { window.onfocus() }")
 #Load the login_url, wait until the title says "Log In"
 load_page_by_title(driver, login_url, "Log In")
 
+
+
 #Try Logging in 
 login_attempt_counter = 0
 while login(driver) == False and login_attempt_counter < 5:
@@ -33,8 +35,14 @@ if login_attempt_counter >= 5:
     print("Error: cannot connect to page")
     sys.exit(f"Website Title: {driver.title}\nCurrent URL: {driver.current_url}")
 
+
+
+
 #Load Search Page
 load_page_by_element(driver, search_url, list_of_listings_xpath)
+
+
+
 
 #Scrape
 i = 1
@@ -48,8 +56,13 @@ while i < 3:
 
 
 # Create the pandas DataFrame
-df = pd.DataFrame(data, columns = ['listing_title', 'company_size', 'job_type', 'application_url'])
+df = pd.DataFrame(data, columns = ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'])
 
+
+
+
+#data filtering
+#df = df[df['company_size'].isin(company_sizes)]
 
 
 # Exporting to CSV
@@ -57,4 +70,7 @@ from pathlib import Path
 filepath = Path('/Users/masakiosato/Desktop/jobs.csv')  
 filepath.parent.mkdir(parents=True, exist_ok=True)  
 df.to_csv(filepath)  
+
+
+
 

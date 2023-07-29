@@ -1,6 +1,8 @@
 login_url = 'https://www.linkedin.com/'
 
 #all xpaths
+job_description_xpath = "/html/body/div[contains(@class, 'application-outlet')]/div[3]/div[4]/div/div/main/div/div[2]/div/div[2]/div[1]/div/div[2]"
+company_name_xpath = "/html/body/div[contains(@class, 'application-outlet')]/div[3]/div[4]/div/div/main/div/div[2]/div/div[2]/div[1]/div/div[1]/div/div[1]/div[1]/div[2]/div/a"
 company_size_xpath = "/html/body/div[contains(@class, 'application-outlet')]/div[3]/div[4]/div/div/main/div/div[2]/div/div[2]/div[1]/div/section/section/div[1]/div[2]/span[1]"
 job_type_xpath = "/html/body/div[contains(@class, 'application-outlet')]/div[3]/div[4]/div/div/main/div/div[2]/div/div[2]/div[1]/div/div[1]/div/div[1]/div[1]/div[3]/ul/li[1]/span"
 submit_button_xpath = "/html/body/main/section[1]/div/div/form[1]/div[2]/button"
@@ -37,3 +39,9 @@ search_url = f'''
     &position=1
     &pageNum=0
 '''.replace("\n    ", "")
+
+
+#Data filtering rules
+bad_application_domains = ['talentify', 'myworkday']
+company_names_ignore = ['talentify', 'dice']
+company_sizes = ['51-200 employees', '201-500 employees', '501-1,000 employees']

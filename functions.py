@@ -1,5 +1,4 @@
 from definitions import *
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
@@ -85,10 +84,10 @@ def get_listing_info(driver):
     loaded = False
     
     listing_title = "N/A"
+    company_name = "N/A"
     company_size = "N/A"
     job_type = "N/A"
     job_description = "N/A"
-    company_name = "N/A"
     
     #Repeat scrape attempts until I fail 5 times
     while loaded == False and counter < 5:
@@ -101,53 +100,34 @@ def get_listing_info(driver):
             listing_title = "N/A"
             error_check[0] = 1
             
+        try:
+            if company_name == "N/A":
+                company_name = driver.find_element(By.XPATH, company_name_xpath).text
+        except:
+            company_name = "N/A"
+            error_check[1] = 1
+
         try: 
             if company_size == "N/A":
                 company_size = driver.find_element(By.XPATH, company_size_xpath).text
         except:
             company_size = "N/A"
-            error_check[1] = 1
-        
-        try:
-            if job_type == "N/A":
-                job_type = driver.find_element(By.XPATH, job_type_xpath).text
-        except:
-            job_type = "N/A"
             error_check[2] = 1
-
-
-
-
-
-
-        #job description
-        # company name
+        
         try:
             if job_type == "N/A":
                 job_type = driver.find_element(By.XPATH, job_type_xpath).text
         except:
             job_type = "N/A"
             error_check[3] = 1
-        
 
         try:
-            if job_type == "N/A":
-                job_type = driver.find_element(By.XPATH, job_type_xpath).text
+            if job_description == "N/A":
+                job_description = driver.find_element(By.XPATH, job_description_xpath).text
         except:
-            job_type = "N/A"
+            job_description = "N/A"
             error_check[4] = 1
-
-
-
-
-
-
-
-
-
-
-
-
+        
 
         if max(error_check) == 1:
             loaded = False
@@ -163,7 +143,7 @@ def get_listing_info(driver):
     else:
         print("Successfully scraped listing info")
     
-    return [listing_title, company_size, job_type]
+    return [listing_title, company_name, company_size, job_type, job_description]
 
 def get_application_url(driver):
     
