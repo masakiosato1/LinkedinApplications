@@ -1,4 +1,4 @@
-from linkedin_scrape import *
+from functions import *
 from definitions import *
 
 from selenium import webdriver
