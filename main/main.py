@@ -1,5 +1,10 @@
-from functions import *
-from definitions import *
+from functions.scraping_functions import *
+from functions.page_loading_functions import *
+
+from definitions.credentials import *
+from definitions.urls import *
+from definitions.xpaths import *
+from definitions.data_filtering import *
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
