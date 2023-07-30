@@ -234,9 +234,12 @@ def go_through_page(driver):
             driver.find_element(By.XPATH, tmp)
         except:
             #click the correct one and start over
-            listing_to_click = driver.find_element(By.XPATH, f"{list_of_listings_xpath}[{i}]")
-            ActionChains(driver).move_to_element(listing_to_click).click(listing_to_click).perform()
-            time.sleep(3)
+            try:
+                listing_to_click = driver.find_element(By.XPATH, f"{list_of_listings_xpath}[{i}]")
+                ActionChains(driver).move_to_element(listing_to_click).click(listing_to_click).perform()
+            except:
+                time.sleep(1)
+            time.sleep(1)
             attempt_counter += 1
             continue
 

@@ -47,7 +47,7 @@ load_page_by_element(driver, search_url, list_of_listings_xpath)
 #Scrape
 i = 1
 data = [] 
-while i < 3:
+while i < 4:
     data = data + go_through_page(driver)
     print(f"Done with page {i}")
     i += 1
