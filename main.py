@@ -5,7 +5,7 @@ from functions.data_functions import *
 from definitions.credentials import *
 from definitions.urls import *
 from definitions.xpaths import *
-from definitions.data_filtering import *
+from definitions.personalize_results import *
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -53,7 +53,7 @@ load_page_by_element(driver, search_url, list_of_listings_xpath)
 #Scrape
 i = 1
 data = [] 
-while i < 4:
+while i < 8:
     data = data + go_through_page(driver)
     print(f"Done with page {i}")
     i += 1
