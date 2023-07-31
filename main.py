@@ -57,8 +57,11 @@ while i < 8:
     data = data + go_through_page(driver)
     print(f"Done with page {i}")
     i += 1
-    next_page_button = driver.find_element(By.XPATH, f"{page_xpath}[{i}]")
-    ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+    try:
+        next_page_button = driver.find_element(By.XPATH, f"{page_xpath}[{i}]")
+        ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+    except:
+        i = 10
 
 
 # Create the pandas DataFrame
@@ -69,13 +72,14 @@ df00 = pd.DataFrame(data, columns = ['listing_title', 'company_name', 'company_s
 df01 = filter_company_size(df00)
 df02 = filter_company_name(df01)
 df03 = filter_application_url(df02)
+df04 = find_description_keywords(df03)
 
 
 # Exporting to CSV
 from pathlib import Path  
-filepath = Path('/Users/masakiosato/Desktop/jobs1.csv')  
+filepath = Path('/Users/masakiosato/Desktop/jobs.csv')  
 filepath.parent.mkdir(parents=True, exist_ok=True)  
-df03.to_csv(filepath)  
+df04.to_csv(filepath)  
 
 
 

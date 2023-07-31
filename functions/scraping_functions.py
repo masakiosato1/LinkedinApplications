@@ -175,7 +175,10 @@ def go_through_page(driver):
         button_text = ''
         if wait_element_load(driver, f"{apply_button_xpath}"):
             time.sleep(1)
-            button_text = driver.find_element(By.XPATH, apply_button_xpath).text
+            try:
+                button_text = driver.find_element(By.XPATH, apply_button_xpath).text
+            except:
+                continue
             time.sleep(1)
         else:
             continue

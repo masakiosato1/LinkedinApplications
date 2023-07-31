@@ -4,7 +4,8 @@ Scrape job listings from Linkedin and filter them to my needs. In order to perso
 # Next Tasks
 - parse and edit job description
     - find the sentence with year
-    - keyword searching
+- add something to stay awake
+- deal with "No longer accepting applications"
 
 # Ideas
 I kinda wanna make it more of a data pipeline. It would be cool to have a pretty big table in like snowflake or something and I can query it using SQL.s
