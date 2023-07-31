@@ -1,5 +1,6 @@
 from functions.scraping_functions import *
 from functions.page_loading_functions import *
+from functions.data_functions import *
 
 from definitions.credentials import *
 from definitions.urls import *
@@ -61,20 +62,20 @@ while i < 4:
 
 
 # Create the pandas DataFrame
-df = pd.DataFrame(data, columns = ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'])
-
-
+df00 = pd.DataFrame(data, columns = ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'])
 
 
 #data filtering
-#df = df[df['company_size'].isin(company_sizes)]
+df01 = filter_company_size(df00)
+df02 = filter_company_name(df01)
+df03 = filter_application_url(df02)
 
 
 # Exporting to CSV
 from pathlib import Path  
-filepath = Path('/Users/masakiosato/Desktop/jobs.csv')  
+filepath = Path('/Users/masakiosato/Desktop/jobs1.csv')  
 filepath.parent.mkdir(parents=True, exist_ok=True)  
-df.to_csv(filepath)  
+df03.to_csv(filepath)  
 
 
 
