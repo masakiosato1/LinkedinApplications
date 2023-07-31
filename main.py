@@ -5,7 +5,7 @@ from functions.data_functions import *
 from definitions.credentials import *
 from definitions.urls import *
 from definitions.xpaths import *
-from definitions.personalize_results import *
+from personalize_results import *
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
