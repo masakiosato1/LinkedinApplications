@@ -44,24 +44,27 @@ if login_attempt_counter >= 5:
 
 
 
-#Load Search Page
-load_page_by_element(driver, search_url, list_of_listings_xpath)
-
-
-
-
-#Scrape
-i = 1
 data = [] 
-while i < 8:
-    data = data + go_through_page(driver)
-    print(f"Done with page {i}")
-    i += 1
-    try:
-        next_page_button = driver.find_element(By.XPATH, f"{page_xpath}[{i}]")
-        ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
-    except:
-        i = 10
+for search_url in search_url_list:
+    print("Running new search url")
+
+    #Load Search Page
+    load_page_by_element(driver, search_url, list_of_listings_xpath)
+
+    #Scrape
+    i = 1
+    while i < 8:
+        data = data + go_through_page(driver)
+        print(f"Done with page {i}")
+        i += 1
+        try:
+            next_page_button = driver.find_element(By.XPATH, f"{page_xpath}[{i}]")
+            ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+        except:
+            i = 10
+
+
+
 
 
 # Create the pandas DataFrame
@@ -73,13 +76,14 @@ df01 = filter_company_size(df00)
 df02 = filter_company_name(df01)
 df03 = filter_application_url(df02)
 df04 = find_description_keywords(df03)
+df05 = df04[['listing_title', 'company_name', 'company_size', 'job_type', 'application_url']].drop_duplicates()
 
 
 # Exporting to CSV
 from pathlib import Path  
 filepath = Path('/Users/masakiosato/Desktop/jobs.csv')  
 filepath.parent.mkdir(parents=True, exist_ok=True)  
-df04.to_csv(filepath)  
+df05.to_csv(filepath)  
 
 
 

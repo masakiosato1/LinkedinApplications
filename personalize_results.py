@@ -8,9 +8,36 @@ geo_id_code='102277331' #San Francisco City. '103644278' for US
 tpr='r604800' #Past week. r86400 for past 24 hours
 distance='&distance=5'
 
-search_url = f'''
+search_url_list = [
+    f'''
     https://www.linkedin.com/jobs/search/
-    ?keywords={search_key}
+    ?keywords={'frontend%20engineer'}
+    &location=United%20States
+    &locationId=
+    &geoId={geo_id_code}
+    &f_TPR={tpr}
+    &f_JT={job_type_code}
+    &f_E={exp_level_code}
+    &f_WT={wt_code}
+    {distance}
+    &position=1
+    &pageNum=0'''.replace("\n    ", ""),
+    f'''
+    https://www.linkedin.com/jobs/search/
+    ?keywords={'full%20stack%20developer'}
+    &location=United%20States
+    &locationId=
+    &geoId={geo_id_code}
+    &f_TPR={tpr}
+    &f_JT={job_type_code}
+    &f_E={exp_level_code}
+    &f_WT={wt_code}
+    {distance}
+    &position=1
+    &pageNum=0'''.replace("\n    ", ""),
+    f'''
+    https://www.linkedin.com/jobs/search/
+    ?keywords={'front%20end%20developer'}
     &location=United%20States
     &locationId=
     &geoId={geo_id_code}
@@ -21,6 +48,7 @@ search_url = f'''
     {distance}
     &position=1
     &pageNum=0'''.replace("\n    ", "")
+]
 
 
 

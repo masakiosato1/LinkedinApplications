@@ -157,7 +157,7 @@ def get_application_url(driver):
     return listing_application_link
 
 def go_through_page(driver):
-
+    time.sleep(3)
     list_of_listings = driver.find_elements(By.XPATH, list_of_listings_xpath)
     data = []
     i = 1
@@ -182,10 +182,9 @@ def go_through_page(driver):
             time.sleep(1)
         else:
             continue
-            time.sleep(1)
         
         
-        if attempt_counter > 10 or 'Easy' in button_text:
+        if attempt_counter > 10 or 'Easy' in button_text or button_text == 'No longer accepting applications':
             attempt_counter = 0
             i += 1
             if 'Easy' in button_text:
@@ -211,6 +210,7 @@ def go_through_page(driver):
             time.sleep(1)
             attempt_counter += 1
             continue
+
 
 
         #Get Listing and go to next loop
