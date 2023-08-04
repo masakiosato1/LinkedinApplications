@@ -5,5 +5,3 @@ Scrape job listings from Linkedin and filter them to my needs. In order to perso
 - deal with job description
     - keyword scoring
     - find the sentence with year
-- add something to stay awake
-- 
