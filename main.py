@@ -1,16 +1,12 @@
+#Imports
 from functions.scraping_functions import *
 from functions.page_loading_functions import *
 from functions.data_functions import *
-
 from definitions.credentials import *
 from definitions.urls import *
 from definitions.xpaths import *
-
 from personalize_results import *
-
 from postgres.postgres_connector import postgres_connector
-
-
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -20,7 +16,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import sys
 from wakepy import keep
 import pandas as pd
-from datetime import datetime
+from datetime import date
 import psycopg2
 
 
@@ -32,6 +28,8 @@ options.add_argument('--ignore-certificate-errors')
 options.add_argument("--incognito")
 driver = webdriver.Chrome(options=options)
 driver.execute_script("window.onblur = function() { window.onfocus() }")
+
+
 
 #Load the login_url, wait until the title says "Log In"
 load_page_by_title(driver, login_url, "Log In")
@@ -48,76 +46,25 @@ if login_attempt_counter >= 5:
     sys.exit(f"Website Title: {driver.title}\nCurrent URL: {driver.current_url}")
 
 
-
-
-data = [] 
-for search_url in search_url_list:
-    print("Running new search url")
-
-    #Load Search Page
-    load_page_by_element(driver, search_url, list_of_listings_xpath)
-
-    #Scrape
-    i = 1
-    while i < 2:
-        data = data + go_through_page(driver)
-        print(f"Done with page {i}")
-        i += 1
-        try:
-            next_page_button = driver.find_element(By.XPATH, f"{page_xpath}[{i}]")
-            ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
-        except:
-            i = 10
+with keep.running() as k:
+    #Scrape each page
+    data = [] 
+    for search_url in search_url_list:
+        print("Running new search url")
+        load_page_by_element(driver, search_url, list_of_listings_xpath)
+        i = 1
+        while i < 9:
+            data = data + go_through_page(driver)
+            print(f"Done with page {i}")
+            i += 1
+            try:
+                click_object(driver, f"{page_xpath}[{i}]")
+            except:
+                break
 
 
 
-postgres_connector = postgres_connector()
-postgres_connector.connect_to_db(output_db_dict)
-
-with postgres_connector.conn.cursor() as curs:
-    #create table
-    try:
-        curs.execute(postgres_connector.create_table_command(output_table_dict))
-        print("Created Table")
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-
-    #insert data into table
-    try:
-        curs.executemany(postgres_connector.insert_table_command(output_table_dict), data)
-        print("Inserted Data")
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-
-
-    postgres_connector.conn.commit()
-    curs.close()
-
-
-
-
-'''
-
-# Create the pandas DataFrame
-df00 = pd.DataFrame(data, columns = ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'])
-
-
-#data filtering
-
-df01 = filter_company_size(df00)
-df02 = filter_company_name(df01)
-df03 = filter_application_url(df02)
-df04 = find_description_keywords(df03)
-df05 = df04.drop_duplicates()
-
-
-# Exporting to CSV
-from pathlib import Path  
-filepath = Path('/Users/masakiosato/Desktop/jobs.csv')  
-filepath.parent.mkdir(parents=True, exist_ok=True)  
-df05.to_csv(filepath)  
-
-
-
-
-'''
+    #Upload to database
+    output_table_dict['table_name'] += f" {date.today()}"
+    postgres_connector = postgres_connector()
+    postgres_connector.insert_data(output_db_dict, output_table_dict, data)

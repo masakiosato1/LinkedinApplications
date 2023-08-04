@@ -11,7 +11,7 @@ distance='&distance=5'
 search_url_list = [
     f'''
     https://www.linkedin.com/jobs/search/
-    ?keywords={'frontend%20engineer'}
+    ?keywords={'javascript'}
     &location=United%20States
     &locationId=
     &geoId={geo_id_code}
@@ -45,8 +45,8 @@ output_db_dict = {
 
 output_table_dict = {
     "table_name": "jobs",
-    "column_names": ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'],
-    "column_types": ['VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)'],
+    "column_names": ['listing_title', 'company_name', 'company_size', 'job_type', 'application_url'],
+    "column_types": ['VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)'],
     "column_conditions": ['','','','','','','']
 }
 

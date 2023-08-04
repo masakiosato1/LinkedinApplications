@@ -72,6 +72,25 @@ class postgres_connector:
         return command
         
 
+    def insert_data(self, output_db_dict, output_table_dict, data):
+        self.connect_to_db(output_db_dict)
+        #create table
+        with self.conn.cursor() as curs:
+            try:
+                curs.execute(self.create_table_command(output_table_dict))
+                print("Created Table")
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+            self.conn.commit()
+            curs.close()
 
-
-
+        self.connect_to_db(output_db_dict)
+        with self.conn.cursor() as curs:
+            #insert data into table
+            try:
+                curs.executemany(self.insert_table_command(output_table_dict), data)
+                print("Inserted Data")
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+            self.conn.commit()
+            curs.close()

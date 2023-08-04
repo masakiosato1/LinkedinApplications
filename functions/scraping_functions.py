@@ -8,6 +8,11 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import sys
 
+def click_object(driver, xpath):
+    next_page_button = driver.find_element(By.XPATH, xpath)
+    time.sleep(1)
+    ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+
 def login(driver):
     #Check to make sure we're at the login page
     if "Log In" not in driver.title:
@@ -26,8 +31,7 @@ def login(driver):
     counter = 0
     while "Feed" not in driver.title and counter < 5:
         try:
-            submit_button = driver.find_element(By.XPATH, submit_button_xpath)
-            ActionChains(driver).move_to_element(submit_button).click(submit_button).perform()
+            click_object(driver, submit_button_xpath)
         except:
             print("Can't find submit button")
             while "checkpoint" in driver.current_url: 
@@ -108,7 +112,8 @@ def get_listing_info(driver):
     else:
         print("Successfully scraped listing info")
     
-    return [listing_title, company_name, company_size, job_type, job_description]
+    #return [listing_title, company_name, company_size, job_type, job_description]
+    return [listing_title, company_name, company_size, job_type]
 
 def get_application_url(driver):
     
@@ -125,11 +130,7 @@ def get_application_url(driver):
     while attempt_counter < 5 and len(driver.window_handles) == 1:
         attempt_counter += 1
         if wait_element_load(driver, f"{apply_button_xpath}"):
-            time.sleep(1)
-            apply_button = driver.find_element(By.XPATH, apply_button_xpath)
-            time.sleep(1)
-            ActionChains(driver).move_to_element(apply_button).click(apply_button).perform()
-            time.sleep(1)
+            click_object(driver, apply_button_xpath)
         else:
             print("Cannot find apply button")
     
@@ -170,7 +171,7 @@ def go_through_page(driver):
         sys.exit(f"Website Title: {driver.title}\nCurrent URL: {driver.current_url}")
     
     while i <= len(list_of_listings):
-        if i>10:
+        if i>55:
             return data
         
         #find apply button and read it
@@ -203,8 +204,7 @@ def go_through_page(driver):
         except:
             #click the correct one and start over
             try:
-                listing_to_click = driver.find_element(By.XPATH, f"{list_of_listings_xpath}[{i}]")
-                ActionChains(driver).move_to_element(listing_to_click).click(listing_to_click).perform()
+                click_object(driver, f"{list_of_listings_xpath}[{i}]")
             except:
                 time.sleep(1)
             attempt_counter += 1
@@ -231,8 +231,7 @@ def go_through_page(driver):
         #t1 = datetime.now()
         #Click next listing
         if i <= len(list_of_listings):
-            listing_to_click = driver.find_element(By.XPATH, f"{list_of_listings_xpath}[{i}]")
-            ActionChains(driver).move_to_element(listing_to_click).click(listing_to_click).perform()
+            click_object(driver, f"{list_of_listings_xpath}[{i}]")
         else:
             #this page is over
             continue
