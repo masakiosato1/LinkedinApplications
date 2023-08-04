@@ -21,32 +21,6 @@ search_url_list = [
     &f_WT={wt_code}
     {distance}
     &position=1
-    &pageNum=0'''.replace("\n    ", ""),
-    f'''
-    https://www.linkedin.com/jobs/search/
-    ?keywords={'full%20stack%20developer'}
-    &location=United%20States
-    &locationId=
-    &geoId={geo_id_code}
-    &f_TPR={tpr}
-    &f_JT={job_type_code}
-    &f_E={exp_level_code}
-    &f_WT={wt_code}
-    {distance}
-    &position=1
-    &pageNum=0'''.replace("\n    ", ""),
-    f'''
-    https://www.linkedin.com/jobs/search/
-    ?keywords={'front%20end%20developer'}
-    &location=United%20States
-    &locationId=
-    &geoId={geo_id_code}
-    &f_TPR={tpr}
-    &f_JT={job_type_code}
-    &f_E={exp_level_code}
-    &f_WT={wt_code}
-    {distance}
-    &position=1
     &pageNum=0'''.replace("\n    ", "")
 ]
 
@@ -57,4 +31,22 @@ bad_application_domains = ['talentify', 'myworkdayjobs', 'dice']
 company_names_ignore = ['Talentify.io', 'Dice', 'Forward']
 company_sizes = ['51-200 employees', '201-500 employees', '501-1,000 employees']
 preferred_keywords = ['javascript', 'typescript', 'react', 'redux']
+
+
+
+
+#Data output
+output_db_dict = {
+    "host": "localhost",
+    "database": "linkedin",
+    "user": "masakiosato",
+    "password": "5234"
+}
+
+output_table_dict = {
+    "table_name": "jobs",
+    "column_names": ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'],
+    "column_types": ['VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)', 'VARCHAR(255)'],
+    "column_conditions": ['','','','','','','']
+}
 

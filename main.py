@@ -5,7 +5,12 @@ from functions.data_functions import *
 from definitions.credentials import *
 from definitions.urls import *
 from definitions.xpaths import *
+
 from personalize_results import *
+
+from postgres.postgres_connector import postgres_connector
+
+
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -16,6 +21,7 @@ import sys
 from wakepy import keep
 import pandas as pd
 from datetime import datetime
+import psycopg2
 
 
 
@@ -53,7 +59,7 @@ for search_url in search_url_list:
 
     #Scrape
     i = 1
-    while i < 8:
+    while i < 2:
         data = data + go_through_page(driver)
         print(f"Done with page {i}")
         i += 1
@@ -65,18 +71,44 @@ for search_url in search_url_list:
 
 
 
+postgres_connector = postgres_connector()
+postgres_connector.connect_to_db(output_db_dict)
 
+with postgres_connector.conn.cursor() as curs:
+    #create table
+    try:
+        curs.execute(postgres_connector.create_table_command(output_table_dict))
+        print("Created Table")
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    #insert data into table
+    try:
+        curs.executemany(postgres_connector.insert_table_command(output_table_dict), data)
+        print("Inserted Data")
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+
+    postgres_connector.conn.commit()
+    curs.close()
+
+
+
+
+'''
 
 # Create the pandas DataFrame
 df00 = pd.DataFrame(data, columns = ['listing_title', 'company_name', 'company_size', 'job_type', 'job_description', 'application_url'])
 
 
 #data filtering
+
 df01 = filter_company_size(df00)
 df02 = filter_company_name(df01)
 df03 = filter_application_url(df02)
 df04 = find_description_keywords(df03)
-df05 = df04[['listing_title', 'company_name', 'company_size', 'job_type', 'application_url']].drop_duplicates()
+df05 = df04.drop_duplicates()
 
 
 # Exporting to CSV
@@ -88,3 +120,4 @@ df05.to_csv(filepath)
 
 
 
+'''

@@ -170,16 +170,16 @@ def go_through_page(driver):
         sys.exit(f"Website Title: {driver.title}\nCurrent URL: {driver.current_url}")
     
     while i <= len(list_of_listings):
+        if i>10:
+            return data
         
         #find apply button and read it
         button_text = ''
         if wait_element_load(driver, f"{apply_button_xpath}"):
-            time.sleep(1)
             try:
                 button_text = driver.find_element(By.XPATH, apply_button_xpath).text
             except:
                 continue
-            time.sleep(1)
         else:
             continue
         
@@ -207,7 +207,6 @@ def go_through_page(driver):
                 ActionChains(driver).move_to_element(listing_to_click).click(listing_to_click).perform()
             except:
                 time.sleep(1)
-            time.sleep(1)
             attempt_counter += 1
             continue
 

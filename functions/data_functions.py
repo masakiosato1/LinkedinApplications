@@ -40,5 +40,4 @@ def find_description_keywords(df_original):
         .astype(str)
         .apply(lambda x: word_check(x.lower()))
     )
-    df_original = df_original[df_original['keyword_score'] > 0]
     return df_original
