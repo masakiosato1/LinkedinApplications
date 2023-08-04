@@ -10,8 +10,8 @@ import sys
 
 def click_object(driver, xpath):
     next_page_button = driver.find_element(By.XPATH, xpath)
-    time.sleep(1)
     ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+    time.sleep(1)
 
 def login(driver):
     #Check to make sure we're at the login page

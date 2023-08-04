@@ -62,9 +62,17 @@ with keep.running() as k:
             except:
                 break
 
-
+    #data check
+    remove=[]
+    for i in data:
+        for j in i:
+            if len(j) >= 255:
+                print(j)
+                remove.append(i)
+                break
+    data = [row for row in data if row not in remove]
 
     #Upload to database
-    output_table_dict['table_name'] += f" {date.today()}"
+    output_table_dict['table_name'] += f"_{date.today()}".replace("-", "_")
     postgres_connector = postgres_connector()
     postgres_connector.insert_data(output_db_dict, output_table_dict, data)
