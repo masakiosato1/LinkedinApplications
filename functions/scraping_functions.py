@@ -47,7 +47,61 @@ def login(driver):
             
     return True
 
+def read_job_description(driver):
+    # read job description and decide whether the job is relevant enough
+        # keywords
+        # years required
+    # returns true or false
+
+    job_description = (
+        driver
+        .find_element(By.XPATH, job_description_xpath)
+        .text
+    )
+
+    #keyword check
+
+
+
+    #year check
+    job_description_split = job_description.split(".")
+
+
+
+    return True
+
 def get_listing_info(driver):
+
+    listing_scrape_method = [
+        By.XPATH,
+        By.CLASS_NAME,
+        By.XPATH,
+        By.XPATH
+    ]
+    listing_scrape_key = [
+        company_name_xpath,
+        "jobs-unified-top-card__job-title",
+        company_size_xpath,
+        job_type_xpath
+    ]
+    listing_info = ['','','','']
+    for i in range(len(listing_info)):
+        counter = 0
+        while True:
+            try:
+                listing_info[i] = driver.find_element(listing_scrape_method[i], listing_scrape_key[i]).text
+                break
+            except:
+                counter += 1
+            if counter >= 5:
+                print(f"Failed to scrape object {i}")
+                break
+
+    return listing_info
+
+
+    '''
+
     #Wait until listing informations is loaded
     counter = 0   
     loaded = False
@@ -57,11 +111,21 @@ def get_listing_info(driver):
     company_size = "N/A"
     job_type = "N/A"
     job_description = "N/A"
+    job_id = "N/A"
+
     
     #Repeat scrape attempts until I fail 5 times
+    
+
+
+
+
+
+
+
     while loaded == False and counter < 5:
         
-        error_check = [0, 0, 0, 0, 0]
+        error_check = [0, 0, 0, 0, 0, 0]
         try:
             if listing_title == "N/A":
                 listing_title = driver.find_element(By.CLASS_NAME, "jobs-unified-top-card__job-title").text
@@ -114,6 +178,7 @@ def get_listing_info(driver):
     
     #return [listing_title, company_name, company_size, job_type, job_description]
     return [listing_title, company_name, company_size, job_type]
+    '''
 
 def get_application_url(driver):
     
@@ -157,11 +222,18 @@ def get_application_url(driver):
     #print("Got Application Link")
     return listing_application_link
 
-def go_through_page(driver):
+def get_listing_id(driver):
+    link = driver.current_url
+    i = link.find('currentJobId=')+13
+    new_link = link[i:]
+    current_listing_id = int(new_link[0:new_link.find('&')])
+    return current_listing_id
+
+def go_through_page(driver, listing_ids):
     time.sleep(3)
     list_of_listings = driver.find_elements(By.XPATH, list_of_listings_xpath)
     data = []
-    i = 1
+    listing_index = 1
     attempt_counter = 0
     #t1 = datetime.now()
 
@@ -170,10 +242,36 @@ def go_through_page(driver):
     if wait_element_load(driver, list_of_listings_xpath) == False:
         sys.exit(f"Website Title: {driver.title}\nCurrent URL: {driver.current_url}")
     
-    while i <= len(list_of_listings):
-        if i>55:
-            return data
+    while listing_index <= len(list_of_listings):
+        attempt_counter += 1
+        if attempt_counter > 5:
+            listing_index += 1
+        if listing_index>55:
+            print("Reached desired limit for this page")
+            break
+
+
+        #Close extra windowss
+        while len(driver.window_handles) > 1:
+            driver.switch_to.window(driver.window_handles[1])
+            driver.close()
+        driver.switch_to.window(driver.window_handles[0])
         
+
+        #click on listing i
+        if listing_index <= len(list_of_listings):
+            click_object(driver, f"{list_of_listings_xpath}[{listing_index}]")
+            attempt_counter = 0
+            listing_index += 1
+        else:
+            #this page is over
+            break
+
+        
+        #get current listing_id
+        current_listing_id = get_listing_id(driver)
+
+
         #find apply button and read it
         button_text = ''
         if wait_element_load(driver, f"{apply_button_xpath}"):
@@ -184,55 +282,37 @@ def go_through_page(driver):
         else:
             continue
         
-        
-        if attempt_counter > 10 or 'Easy' in button_text or button_text == 'No longer accepting applications':
+
+
+        #Potential Listing Skip
+        if attempt_counter > 5:
+            print("Error: Skipping this listing, exceeded 5 attempts")
             attempt_counter = 0
-            i += 1
-            if 'Easy' in button_text:
-                print("Skipping because Easy Apply")
-            else:
-                print("Error: Skipping this listing")
-            
-            #t1 = datetime.now()
-
-
-        #Make sure correct listing is selected
-        try:
-            #This fails when my screen isn't focused on the browser
-            tmp = f"/html/body/div[contains(@class, 'application-outlet')]/div[3]/div[4]/div/div/main/div/div[1]/div/ul/li[{i}]/div/div[contains(@class, 'jobs-search-results-list__list-item--active')]"
-            driver.find_element(By.XPATH, tmp)
-        except:
-            #click the correct one and start over
-            try:
-                click_object(driver, f"{list_of_listings_xpath}[{i}]")
-            except:
-                time.sleep(1)
-            attempt_counter += 1
+            listing_index += 1
             continue
-
+        elif 'Easy' in button_text:
+            print("Skipping because Easy Apply")
+            attempt_counter = 0
+            listing_index += 1
+            continue
+        elif button_text == 'No longer accepting applications':
+            print("Skipping because no longer accepting applications")
+            attempt_counter = 0
+            listing_index += 1
+            continue
+        elif current_listing_id in listing_ids:
+            print("Skipping because already scraped this listing")
+            attempt_counter = 0
+            listing_index += 1
+            continue
+        else:
+            listing_ids.append(current_listing_id)
 
 
         #Get Listing and go to next loop
         listing_info = get_listing_info(driver)
         listing_info.append(get_application_url(driver))
+        listing_info.append(current_listing_id)
         data.append(listing_info)
-        attempt_counter = 0
-        i += 1
         
-        #Close extra windows
-        while len(driver.window_handles) > 1:
-            driver.switch_to.window(driver.window_handles[1])
-            driver.close()
-        driver.switch_to.window(driver.window_handles[0])
-        
-        
-        
-        #print(datetime.now() - t1)
-        #t1 = datetime.now()
-        #Click next listing
-        if i <= len(list_of_listings):
-            click_object(driver, f"{list_of_listings_xpath}[{i}]")
-        else:
-            #this page is over
-            continue
-    return data
+    return data, listing_ids

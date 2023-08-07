@@ -94,3 +94,16 @@ class postgres_connector:
                 print(error)
             self.conn.commit()
             curs.close()
+
+    def get_data(self, db_dict, query):
+        self.connect_to_db(db_dict)
+        with self.conn.cursor() as curs:
+            try:
+                curs.execute(query)
+                data = curs.fetchall()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                return []
+            self.conn.commit()
+            curs.close()
+        return data
