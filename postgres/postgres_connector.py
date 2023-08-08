@@ -83,10 +83,9 @@ class postgres_connector:
                 print(error)
             self.conn.commit()
             curs.close()
-
+        #insert data into table
         self.connect_to_db(output_db_dict)
         with self.conn.cursor() as curs:
-            #insert data into table
             try:
                 curs.executemany(self.insert_table_command(output_table_dict), data)
                 print("Inserted Data")

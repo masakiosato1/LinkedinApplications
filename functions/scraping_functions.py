@@ -8,14 +8,16 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import sys
 
-def click_object(driver, xpath):
-    try:
-        time.sleep(1)
-        next_page_button = driver.find_element(By.XPATH, xpath)
-        ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
-        time.sleep(1)
-    except:
-        print("Failed to click object")
+def click_object(driver, xpath, attempt_limit = 3):
+    for i in range(attempt_limit):
+        try:
+            next_page_button = driver.find_element(By.XPATH, xpath)
+            ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+            time.sleep(1)
+            break
+        except:
+            print("Failed to click object")
+    print(f"Failed to click object {attempt_limit} times")
 
 def login(driver):
     #Check to make sure we're at the login page
@@ -35,7 +37,7 @@ def login(driver):
     counter = 0
     while "Feed" not in driver.title and counter < 5:
         try:
-            click_object(driver, submit_button_xpath)
+            click_object(driver, submit_button_xpath, 3)
         except:
             print("Can't find submit button")
             while "checkpoint" in driver.current_url: 
@@ -244,18 +246,17 @@ def go_through_page(driver, listing_ids, preferred_keywords, today, keyword_matc
     time.sleep(3)
     list_of_listings = driver.find_elements(By.XPATH, list_of_listings_xpath)
     data = []
-    listing_index = 0
+    listing_index = 1
     attempt_counter = 0
-    #t1 = datetime.now()
-
-    
-    #Make sure next listing is ready
     if wait_element_load(driver, list_of_listings_xpath) == False:
         sys.exit(f"Website Title: {driver.title}\nCurrent URL: {driver.current_url}")
     
     while listing_index <= len(list_of_listings):
+        #print(f"listing_index: {listing_index}")
+        #print(f"attempt_counter: {attempt_counter}")
+        #print(f"window_count: {len(driver.window_handles)}")
         attempt_counter += 1
-        if listing_index>55:
+        if listing_index>5:
             print("Reached desired limit for this page")
             break
 
@@ -264,14 +265,19 @@ def go_through_page(driver, listing_ids, preferred_keywords, today, keyword_matc
         while len(driver.window_handles) > 1:
             driver.switch_to.window(driver.window_handles[1])
             driver.close()
+            time.sleep(1)
         driver.switch_to.window(driver.window_handles[0])
         
 
         #click on listing i
         if listing_index <= len(list_of_listings):
-            click_object(driver, f"{list_of_listings_xpath}[{listing_index}]")
-            attempt_counter = 0
-            listing_index += 1
+            try:
+                click_object(driver, f"{list_of_listings_xpath}[{listing_index}]")
+            except:
+                print("Couldn't click next listing")
+                break
+            #attempt_counter = 0
+            #listing_index += 1
         else:
             #this page is over
             break
@@ -323,7 +329,7 @@ def go_through_page(driver, listing_ids, preferred_keywords, today, keyword_matc
             listing_index += 1
             continue
         else:
-            listing_ids.append(current_listing_id)
+            print("Not skipping this listing")
 
 
         #Get Listing and go to next loop
@@ -331,5 +337,10 @@ def go_through_page(driver, listing_ids, preferred_keywords, today, keyword_matc
         listing_info += get_listing_info(driver)
         listing_info += [get_application_url(driver), keyword_count, years]
         data.append(listing_info)
+        listing_ids.append(current_listing_id)
+
+
+        attempt_counter = 0
+        listing_index += 1
         
     return data, listing_ids

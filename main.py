@@ -66,17 +66,14 @@ with keep.running() as k:
             data = new_data
             print(f"Count of saved listing_ids: {len(listing_ids)}")
 
-
             #data check
             for row in range(len(data)):
-                data[row].append(date.today())
                 for col in range(len(data[row])):
                     try:
-                        if len(j) >= 255:
-                            data[row][col] = data[row][col][0:254]
+                        if len(data[row][col]) >= 254:
+                            data[row][col] = data[row][col][0:253]
                     except:
                         continue
-
 
 
             #Upload to database
@@ -84,7 +81,6 @@ with keep.running() as k:
                 postgres_connector = postgres_connector()
             except:
                 print("already defined postgres")
-
             postgres_connector.insert_data(output_db_dict, output_table_dict, data)
             print(f"Done loading data from page {i}")
             i += 1
