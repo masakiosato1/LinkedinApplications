@@ -45,9 +45,10 @@ if login_attempt_counter >= 5:
 
 
 #Get list of previously scraped jobs
-query = "select listing_id from jobs"
+query = f"select listing_id from {output_table_dict['table_name']}"
 postgres_connector = postgres_connector()
 listing_ids = postgres_connector.get_data(output_db_dict, query)
+print(f"{len(listing_ids)} listing_ids already scraped")
 
 
 
@@ -59,33 +60,35 @@ with keep.running() as k:
         print("Running new search url")
         load_page_by_element(driver, search_url, list_of_listings_xpath)
         i = 1
-        while i < 9:
-            new_data, listing_ids = go_through_page(driver, listing_ids)
-            data += new_data
+        while i < 9: #For each page
+            new_data, listing_ids = go_through_page(driver, listing_ids, preferred_keywords, date.today(), keyword_match_matters)
+            #data += new_data
+            data = new_data
             print(f"Count of saved listing_ids: {len(listing_ids)}")
-            print(f"Done with page {i}")
+
+
+            #data check
+            for row in range(len(data)):
+                data[row].append(date.today())
+                for col in range(len(data[row])):
+                    try:
+                        if len(j) >= 255:
+                            data[row][col] = data[row][col][0:254]
+                    except:
+                        continue
+
+
+
+            #Upload to database
+            try:
+                postgres_connector = postgres_connector()
+            except:
+                print("already defined postgres")
+
+            postgres_connector.insert_data(output_db_dict, output_table_dict, data)
+            print(f"Done loading data from page {i}")
             i += 1
             try:
                 click_object(driver, f"{page_xpath}[{i}]")
             except:
                 break
-
-
-    #data check
-    for i in range(len(data)):
-        data[i].append(date.today())
-        for j in range(len(data[i])):
-            try:
-                if len(j) >= 255:
-                    data[i][j] = data[i][j][0:254]
-            except:
-                continue
-
-
-
-    #Upload to database
-    try:
-        postgres_connector = postgres_connector()
-    except:
-        print("already defined postres")
-    postgres_connector.insert_data(output_db_dict, output_table_dict, data)

@@ -9,9 +9,13 @@ import time
 import sys
 
 def click_object(driver, xpath):
-    next_page_button = driver.find_element(By.XPATH, xpath)
-    ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
-    time.sleep(1)
+    try:
+        time.sleep(1)
+        next_page_button = driver.find_element(By.XPATH, xpath)
+        ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
+        time.sleep(1)
+    except:
+        print("Failed to click object")
 
 def login(driver):
     #Check to make sure we're at the login page
@@ -47,7 +51,7 @@ def login(driver):
             
     return True
 
-def read_job_description(driver):
+def read_job_description(driver, preferred_keywords):
     # read job description and decide whether the job is relevant enough
         # keywords
         # years required
@@ -60,29 +64,36 @@ def read_job_description(driver):
     )
 
     #keyword check
-
+    keyword_count = 0
+    for keyword in preferred_keywords:
+        if keyword in job_description:
+            keyword_count += 1
 
 
     #year check
     job_description_split = job_description.split(".")
+    years = ""
+    for sentence in job_description_split:
+        if "year" in sentence:
+            years += sentence
 
 
 
-    return True
+    return keyword_count, years
 
 def get_listing_info(driver):
 
     listing_scrape_method = [
-        By.XPATH,
         By.CLASS_NAME,
+        By.XPATH,
         By.XPATH,
         By.XPATH
     ]
     listing_scrape_key = [
-        company_name_xpath,
         "jobs-unified-top-card__job-title",
-        company_size_xpath,
-        job_type_xpath
+        job_type_xpath,
+        company_name_xpath,
+        company_size_xpath
     ]
     listing_info = ['','','','']
     for i in range(len(listing_info)):
@@ -229,11 +240,11 @@ def get_listing_id(driver):
     current_listing_id = int(new_link[0:new_link.find('&')])
     return current_listing_id
 
-def go_through_page(driver, listing_ids):
+def go_through_page(driver, listing_ids, preferred_keywords, today, keyword_match_matters):
     time.sleep(3)
     list_of_listings = driver.find_elements(By.XPATH, list_of_listings_xpath)
     data = []
-    listing_index = 1
+    listing_index = 0
     attempt_counter = 0
     #t1 = datetime.now()
 
@@ -244,8 +255,6 @@ def go_through_page(driver, listing_ids):
     
     while listing_index <= len(list_of_listings):
         attempt_counter += 1
-        if attempt_counter > 5:
-            listing_index += 1
         if listing_index>55:
             print("Reached desired limit for this page")
             break
@@ -280,8 +289,11 @@ def go_through_page(driver, listing_ids):
             except:
                 continue
         else:
+            print("wait_element_load for apply button returned false")
             continue
         
+
+        keyword_count, years = read_job_description(driver, preferred_keywords)
 
 
         #Potential Listing Skip
@@ -305,14 +317,19 @@ def go_through_page(driver, listing_ids):
             attempt_counter = 0
             listing_index += 1
             continue
+        elif keyword_count == 0 and keyword_match_matters:
+            print("Skipping because no keyword matches")
+            attempt_counter = 0
+            listing_index += 1
+            continue
         else:
             listing_ids.append(current_listing_id)
 
 
         #Get Listing and go to next loop
-        listing_info = get_listing_info(driver)
-        listing_info.append(get_application_url(driver))
-        listing_info.append(current_listing_id)
+        listing_info = [today, current_listing_id]
+        listing_info += get_listing_info(driver)
+        listing_info += [get_application_url(driver), keyword_count, years]
         data.append(listing_info)
         
     return data, listing_ids
