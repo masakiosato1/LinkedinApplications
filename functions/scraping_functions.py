@@ -14,10 +14,14 @@ def click_object(driver, xpath, attempt_limit = 3):
             next_page_button = driver.find_element(By.XPATH, xpath)
             ActionChains(driver).move_to_element(next_page_button).click(next_page_button).perform()
             time.sleep(1)
-            break
+            return
         except:
             print("Failed to click object")
+            if i > 2 and attempt_limit > 3:
+                driver.refresh()
+                time.sleep(5)
     print(f"Failed to click object {attempt_limit} times")
+    print(f"Tried to click {xpath}")
 
 def login(driver):
     #Check to make sure we're at the login page
@@ -256,7 +260,7 @@ def go_through_page(driver, listing_ids, preferred_keywords, today, keyword_matc
         #print(f"attempt_counter: {attempt_counter}")
         #print(f"window_count: {len(driver.window_handles)}")
         attempt_counter += 1
-        if listing_index>5:
+        if listing_index>55:
             print("Reached desired limit for this page")
             break
 

@@ -3,7 +3,7 @@
 running_for = "masaki" #forest or alex
 
 if running_for == "masaki":
-    search_keys = ['Data Analyst', 'Data Engineer']
+    search_keys = ['Data Analyst', 'Data Engineer', 'Analytics Engineer']
     wt_code='2' #Remote 
     geo_id_code='103644278' #US
     distance=''

@@ -45,11 +45,12 @@ if login_attempt_counter >= 5:
 
 
 #Get list of previously scraped jobs
+listing_ids = []
 query = f"select listing_id from {output_table_dict['table_name']}"
 postgres_connector = postgres_connector()
-listing_ids = postgres_connector.get_data(output_db_dict, query)
+for row in postgres_connector.get_data(output_db_dict, query):
+    listing_ids.append(row[0])
 print(f"{len(listing_ids)} listing_ids already scraped")
-
 
 
 #Stay awake while the long stuff happens
@@ -84,7 +85,9 @@ with keep.running() as k:
             postgres_connector.insert_data(output_db_dict, output_table_dict, data)
             print(f"Done loading data from page {i}")
             i += 1
+
             try:
-                click_object(driver, f"{page_xpath}[{i}]")
+                click_object(driver, f"{page_xpath}[{i}]", 5)
             except:
                 break
+    print("Done with all searches")
