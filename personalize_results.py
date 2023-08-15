@@ -1,6 +1,6 @@
 #Running for who?
 
-running_for = "masaki" #forest or alex
+running_for = "alex" #forest or alex
 
 if running_for == "masaki":
     search_keys = ['Data Analyst', 'Data Engineer', 'Analytics Engineer']
@@ -23,11 +23,11 @@ elif running_for == "forest":
     preferred_keywords = ['javascript', 'typescript', 'react', 'redux', 'node', 'mongo', 'html', 'css', 'sass', 'frontend', 'fullstack']
     keyword_match_matters = True
 elif running_for == "alex":
-    search_keys = ['Data Analyst', 'Data Engineer']
+    search_keys = ['Data Analyst', 'Data', 'Excel', 'Tableau', 'SQL', 'Junior']
     wt_code='2' #Remote 
     geo_id_code='103644278' #US
     distance=''
-    exp_level_code = '2' #Entry level
+    exp_level_code = '1%2C2' #Intern and Entry level
     
     preferred_keywords = ['data', 'analyst', 'analysis', 'bachelors', 'excel', 'microsoft', 'sql', 'tableau']
     keyword_match_matters = False

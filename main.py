@@ -6,7 +6,7 @@ from definitions.credentials import *
 from definitions.urls import *
 from definitions.xpaths import *
 from personalize_results import *
-from postgres.postgres_connector import postgres_connector
+from objects.postgres_connector import postgres_connector
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service

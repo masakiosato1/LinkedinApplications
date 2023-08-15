@@ -23,3 +23,4 @@ Use the Selenium python library to navigate the Linkedin website and scrape job 
     - potentially use to skip irrelevant listings
     - keyword scoring
     - find the sentence with year
+- Identify how many row are available
